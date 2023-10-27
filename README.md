@@ -12,16 +12,6 @@ Accumulator bets are a popular product that allows users to increase their odds 
 4. Calculate the accumulator odds.
 5. Check whether the business is happy to accept the accumulator odds (based on the total risk).
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js
-
-### Installation
-
-1. Clone the repository:
-
 ## Files
 
 - `API.ts`: Contains mock API functions that simulate external service calls.
