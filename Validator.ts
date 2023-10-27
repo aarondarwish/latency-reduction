@@ -1,41 +1,51 @@
 import { validateUserRisk, getOutcomeOdds, validateOdd, validateAccumalatorRisk } from "./API";
 
 export interface User{
-    id: number,
+  id: number,
 }
 
-
 export interface AccumalatorRequest{
-    user: User;
-    outcomeIds: number[];
+  user: User;
+  outcomeIds: number[];
 }
 
 export interface AccumalatorResponse{
-    accumalatorOdds?: number, 
-    accept: boolean,
+  accumalatorOdds?: number, 
+  accept: boolean,
 }
 
 export const validateAccumalator = async(accumalatorRequest: AccumalatorRequest): Promise<AccumalatorResponse> => {
-    const validUser = await validateUserRisk(accumalatorRequest.user.id);
-
-    let odds: number[] = [];
-    for (const outcomeId of accumalatorRequest.outcomeIds){
-        const odd = await getOutcomeOdds(outcomeId);
-        odds.push(odd);
-    }
-
-    let validOdds = true;
-    for (const odd of odds){
-        const oddValid = await validateOdd(odd);
-        validOdds = validOdds && oddValid;
-    }
-
-    const accumalatorOdds = odds.reduce( (a,b) => a * b );
-    const validAccumalatorRisk = await validateAccumalatorRisk(accumalatorOdds);
-
+  const validUser = await validateUserRisk(accumalatorRequest.user.id);
+  if (!validUser) {
     return {
-        accumalatorOdds,
-        accept: validAccumalatorRisk && validOdds && validUser,
-    }
+      accept: false,
+    };
+  }
 
-}
+  const oddsPromises = accumalatorRequest.outcomeIds.map(getOutcomeOdds);
+  const odds = await Promise.all(oddsPromises);
+
+  const validOddsPromises = odds.map(validateOdd);
+  const validOddsResults = await Promise.all(validOddsPromises);
+
+  const validOdds = validOddsResults.every(result => result);
+  if (!validOdds) {
+    return {
+      accept: false,
+    };
+  }
+
+  const accumalatorOdds = odds.reduce((a, b) => a * b);
+  const validAccumalatorRisk = await validateAccumalatorRisk(accumalatorOdds);
+  if (!validAccumalatorRisk) {
+    return {
+      accumalatorOdds,
+      accept: false,
+    };
+  }
+
+  return {
+    accumalatorOdds,
+    accept: true,
+  };
+};
