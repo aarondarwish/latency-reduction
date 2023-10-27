@@ -1,28 +1,35 @@
-# AsyncAwait
+# Betting Odds Validator (Async Await task)
 
-## Accumalators
-Accumalator bets are a popular product around the world! You can increase your odds by betting on two things happening.
-When you do this, the odds are multiplied together 
-E.G.
-- England win vs. France, odds of 2
-- England win vs. Germany, odds of 3
-- Total odds, 6
+A Node.js application that validates accumulator bets by checking user risk, outcome odds, and accumulator risk.
 
-## Validation
-When a user places a bet on an outcome, we need to do the following tasks before we can accept the bet
-- Decided whether or not the user is able to bet (they might have no money!)
-- Get the odds for each outcome
-- Decide whether the business is happy to accept each odd individually (the risk)
-- Calculate the accumalator odds
-- Decide whether the business is happy to accept the accumalated odds (the total risk)
+## Overview
 
-This requires multiple calls to various services; each has a latency. We want to minimise this latency.
+Accumulator bets are a popular product that allows users to increase their odds by betting on multiple outcomes. The odds for each outcome are multiplied together to calculate the total odds. This project contains a function that validates accumulator bets by performing the following tasks:
+
+1. Check whether the user is able to bet (e.g., they have enough money).
+2. Retrieve the odds for each outcome.
+3. Check whether the business is happy to accept each odd individually (based on the risk).
+4. Calculate the accumulator odds.
+5. Check whether the business is happy to accept the accumulator odds (based on the total risk).
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+
+### Installation
+
+1. Clone the repository:
+
+## Files
+
+- `API.ts`: Contains mock API functions that simulate external service calls.
+- `jest.config.js`: Configuration file for Jest testing framework.
+- `package.json`: Contains metadata about the project and scripts for running tests.
+- `Validator.spec.ts`: Test suite for the `validateAccumulator` function.
+- `Validator.ts`: Main logic for the accumulator validation.
 
 ## Task
-- We have somee sample code in `Validator.ts`.
-- We have a test suite in `Validator.spec.ts`. All the tests pass.
-- We have some mock services in `API.ts`. Each service has a mock latency.
-    - You may not modify the `API.ts`. Think of them as an external provider.
-- You must reduce the latency to as low as possible. `Node.js` is an ideal langauge for this task!
-    - Start off by extimating how long each test will take to run. Can you predict it?
 
+The main task is to optimize the `validateAccumulator` function in `Validator.ts` to minimize the latency from the mock API calls.
