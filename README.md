@@ -20,6 +20,43 @@ Accumulator bets are a popular product that allows users to increase their odds 
 - `Validator.spec.ts`: Test suite for the `validateAccumulator` function.
 - `Validator.ts`: Main logic for the accumulator validation.
 
-## Task
+## Tasks
 
-The main task is to optimize the `validateAccumulator` function in `Validator.ts` to minimize the latency from the mock API calls.
+### Estimate how long each test will take to run.
+
+Given the structure of our application and the mock latencies defined in `API.ts`, we can estimate the latency for each test case in `Validator.spec.ts`.
+
+### Test Case 1: Should reject bets from user 1
+
+- `validateUserRisk`: 0.1s (latency for user ID 1)
+- Total estimated time: 0.1s
+
+### Test Case 2: Should accept bets from user 2
+
+- `validateUserRisk`: 0.1s (latency for user ID 2)
+- `getOutcomeOdds`: 0.1s * 2 outcomes = 0.2s
+- `validateOdd`: 0.1s * 2 outcomes = 0.2s
+- `validateAccumulatorRisk`: 0.1s
+- Total estimated time: 0.6s
+
+### Test Case 3: Should reject outcome 11
+
+- `validateUserRisk`: 0.1s (latency for user ID 2)
+- `getOutcomeOdds`: 0.1s * 2 outcomes = 0.2s
+- `validateOdd`: 0.1s * 2 outcomes = 0.2s (0.1s latency will be for outcome 11, which will reject the bet)
+- Total estimated time: 0.5s
+
+### Test Case 4: Should reject this outcome combination
+
+- `validateUserRisk`: 0.1s (latency for user ID 2)
+- `getOutcomeOdds`: 0.1s * 4 outcomes = 0.4s
+- `validateOdd`: 0.1s * 4 outcomes = 0.4s
+- `validateAccumulatorRisk`: 0.1s
+- Total estimated time: 1.0s
+
+### Main task
+The primary task is to optimise the `validateAccumulator` function in `Validator.ts` to minimise the latency arising from the mock API calls.
+
+
+
+
