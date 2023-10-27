@@ -1,51 +1,46 @@
-import { validateUserRisk, getOutcomeOdds, validateOdd, validateAccumalatorRisk } from "./API";
+import {
+  validateUserRisk,
+  getOutcomeOdds,
+  validateOdd,
+  validateAccumalatorRisk,
+} from './API';
 
-export interface User{
-  id: number,
+export interface User {
+  id: number;
 }
 
-export interface AccumalatorRequest{
+export interface AccumalatorRequest {
   user: User;
   outcomeIds: number[];
 }
 
-export interface AccumalatorResponse{
-  accumalatorOdds?: number, 
-  accept: boolean,
+export interface AccumalatorResponse {
+  accumalatorOdds?: number;
+  accept: boolean;
 }
 
-export const validateAccumalator = async(accumalatorRequest: AccumalatorRequest): Promise<AccumalatorResponse> => {
-  const validUser = await validateUserRisk(accumalatorRequest.user.id);
-  if (!validUser) {
-    return {
-      accept: false,
-    };
-  }
+export const validateAccumalator = async (
+  accumalatorRequest: AccumalatorRequest
+): Promise<AccumalatorResponse> => {
+  const validUserPromise = validateUserRisk(accumalatorRequest.user.id);
 
   const oddsPromises = accumalatorRequest.outcomeIds.map(getOutcomeOdds);
   const odds = await Promise.all(oddsPromises);
 
   const validOddsPromises = odds.map(validateOdd);
   const validOddsResults = await Promise.all(validOddsPromises);
-
-  const validOdds = validOddsResults.every(result => result);
-  if (!validOdds) {
-    return {
-      accept: false,
-    };
-  }
+  const validOdds = validOddsResults.every(Boolean);
 
   const accumalatorOdds = odds.reduce((a, b) => a * b);
-  const validAccumalatorRisk = await validateAccumalatorRisk(accumalatorOdds);
-  if (!validAccumalatorRisk) {
-    return {
-      accumalatorOdds,
-      accept: false,
-    };
-  }
+  const validAccumalatorRiskPromise = validateAccumalatorRisk(accumalatorOdds);
+
+  const [validUser, validAccumalatorRisk] = await Promise.all([
+    validUserPromise,
+    validAccumalatorRiskPromise,
+  ]);
 
   return {
     accumalatorOdds,
-    accept: true,
+    accept: validAccumalatorRisk && validOdds && validUser,
   };
 };
